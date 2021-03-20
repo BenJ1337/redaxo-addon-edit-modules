@@ -7,58 +7,61 @@ class rex_api_modules extends rex_api_function
 
     function execute()
     {
+        $logger = rex_logger::factory();
         $response = '{}';
         header('Content-Type: application/json');
         try {
             if ('GET' === $_SERVER['REQUEST_METHOD']) {
-                if (isset($mid) && !empty($mid)) {
+                if (isset($_GET['mid']) && !empty($_GET['mid'])) {
                     $response = $this->getModuleAsJSON($_GET['mid']);
                 } else {
                     $response = $this->getModulesAsJSON();
                 }
             } else if ('POST' === $_SERVER['REQUEST_METHOD']) {
+                $logger->info('POST: ' . json_encode($_POST));
                 if (isset($_POST['module']) && !empty($_POST['module'])) {
-                    $response = $this->updateModule(json_decode($_POST['module'], true));
+                    $logger->info('Module vorhanden.');
+                    $response = $this->storeModule(json_decode($_POST['module'], true));
                 }
             } else if ('PUT' === $_SERVER['REQUEST_METHOD']) {
                 $messageBody = file_get_contents('php://input');
                 if (!empty($messageBody)) {
-                    parse_str($messageBody, $data);
-                    if (isset($data['module']) && !empty($data['module'])) {
-                        $response = $this->insertModule(json_decode($data['module'], true));
-                    }
+                    $response = $this->storeModule(json_decode($messageBody, true));
                 }
             } else if ('DELETE' === $_SERVER['REQUEST_METHOD']) {
-                $messageBody = file_get_contents('php://input');
-                if (!empty($messageBody)) {
-                    parse_str($messageBody, $data);
-                    if (isset($data['mid']) && !empty($data['mid'])) {
-                        $response = $this->deleteModule(json_decode($data['mid'], true));
-                    }
+                if (isset($_GET['mid']) && !empty($_GET['mid'])) {
+                    $response = $this->deleteModule($_GET['mid']);
                 }
             } else {
                 header($_SERVER['REQUEST_METHOD'] . ' 405 Method Not Allowed', true, 405);
             }
         } catch (rex_sql_exception | Exception $ex) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-            $logger = rex_logger::factory();
             $logger->error('Error [Edit-Modules REST-Api] : {exMessage}', array('exMessage' => $ex->getMessage()));
         }
         echo $response;
         exit();
     }
 
-    private function insertModule($module)
+    private function storeModule($module)
     {
+        $logger = rex_logger::factory();
         $sql = rex_sql::factory();
         $sql->setTable('rex_module');
-        if (isset($module['id'])) {
-            $logger = rex_logger::factory();
+        if (isset($module['neuanlage']) && $module['neuanlage']) {
             $logger->warning('Warnung [Edit-Modules REST-Api] : {message}', array('message' => 'Id aus Module vor INSERT entfernt'));
             unset($module['id']);
         }
+        unset($module['neuanlage']);
         $sql->setValues($module);
-        $sql->insert();
+        $logger->info(json_encode($module));
+        $logger->info('' . isset($module['id']));
+        if (!isset($module['id'])) {
+            $sql->insert();
+        } else {
+            $sql->setWhere("id = :mid", array('mid' => $module['id']));
+            $sql->update();
+        }
         return json_encode(array('rows' => $sql->getRows(), 'lastId' => $sql->getLastId()));
     }
 
