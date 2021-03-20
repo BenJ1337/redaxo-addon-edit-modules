@@ -41,10 +41,17 @@
     .c-module textarea {
         border: none;
         border: 1px solid rgba(0, 0, 0, 0.4);
-        background: rgba(0, 0, 0, 0.7);
+        background-color: rgba(0, 0, 0, 0.7);
         color: #ddd;
         width: 100%;
         padding: 2px 2px 2px 10px;
+        transition: background-color 0.2s ease;
+    }
+
+    .c-module input:focus,
+    .c-module textarea:focus {
+        outline: none;
+        background-color: rgba(0, 0, 0, 0.9);
     }
 
     .c-module textarea {
