@@ -24,11 +24,12 @@ export const ModuleWrapper = {
             let maxId = Math.max(...ids);
             let module = Module.createModule(++maxId,
                 null,
-                'Mustername',
+                '',
                 '',
                 '',
                 new Date(),
-                'edit Modules Addon',
+                '',
+                new Date(),
                 '',
                 '',
                 0,
@@ -38,7 +39,6 @@ export const ModuleWrapper = {
     },
     computed: {
         getModules: function () {
-            console.log(this.$store.getters.getModules);
             return this.$store.getters.getModules;
         }
     }

@@ -8,8 +8,9 @@ export default class Module {
     output;
     input;
     createdate;
-    creatuser;
+    createuser;
     updateuser;
+    updatedate;
     attributes;
     revision;
     neuanlage;
@@ -20,8 +21,9 @@ export default class Module {
         this.name = '';
         this.input = '';
         this.output = '';
-        this.createdate = '';
+        this.createdate = null;
         this.createuser = '';
+        this.updatedate = null;
         this.updateuser = '';
         this.attributes = '';
         this.revision = 0;
@@ -34,7 +36,7 @@ export default class Module {
         return module;
     }
 
-    static createModule(id, key, name, input, output, createdate, createuser, updateuser, attributes, revision, neuanlage) {
+    static createModule(id, key, name, input, output, createdate, createuser, updatedate, updateuser, attributes, revision, neuanlage) {
         let module = new Module();
         module.id = id;
         module.key = key;
@@ -43,6 +45,7 @@ export default class Module {
         module.output = output;
         module.createdate = createdate;
         module.createuser = createuser;
+        module.updatedate = updatedate;
         module.updateuser = updateuser;
         module.attributes = attributes;
         module.revision = revision;

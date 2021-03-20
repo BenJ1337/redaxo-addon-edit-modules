@@ -9,15 +9,17 @@ export function createStore() {
         },
         mutations: {
             addModule(state, module) {
-                console.log("add Module with id: " + module.getId());
+                console.log('add module to state with id: ' + module.getId());
                 Vue.set(state.modules, module.id, module);
             },
             deleteModule(state, module) {
+                console.log('delete module from state with id: ' + module.getId());
                 Vue.delete(state.modules, module.id);
             }
         },
         actions: {
             fetchModules(store) {
+                console.log('load module from database');
                 return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules')
                     .then(resp => {
                         if (resp.data.length > 0) {
@@ -27,32 +29,36 @@ export function createStore() {
                                 store.commit('addModule', module);
                             });
                         } else {
-                            console.log("Keine Module in der Datenbank.");
+                            console.log("no modules in database.");
                         }
                     });
             },
             storeModule(store, moduleN) {
+                moduleN.updatedate = new Date();
                 if (moduleN.neuanlage) {
+                    console.log('store new module in database with id: ' + moduleN.id);
                     axios.put('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', JSON.stringify(moduleN))
                         .then(resp => {
                             if (resp.status == 200) {
                                 return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + resp.data.lastId);
                             }
-                            throw new Error("Speichern nicht erfolgreich");
+                            throw new Error("storing failed");
                         })
                         .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
                 } else {
+                    console.log('update module in database with id: ' + moduleN.id);
                     axios.post('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', 'module=' + JSON.stringify(moduleN))
                         .then(resp => {
                             if (resp.status == 200) {
                                 return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id);
                             }
-                            throw new Error("Speichern nicht erfolgreich");
+                            throw new Error("storing failed");
                         })
                         .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
                 }
             },
             deleteModule(store, module) {
+                console.log('delete module in databse with id: ' + module.id);
                 if (!module.neuanlage) {
                     axios.delete('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + module.id)
                         .then(resp => console.log(resp.data));
@@ -60,6 +66,7 @@ export function createStore() {
                 store.commit('deleteModule', module);
             },
             resetModule(store, moduleN) {
+                console.log('load current version of module from database for id: ' + moduleN.id);
                 axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id)
                     .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
             }
@@ -81,6 +88,7 @@ function parseModuleJSON(json) {
         json.output,
         json.createdate,
         json.createuser,
+        json.updatedate,
         json.updateuser,
         json.attributes,
         json.revision);
