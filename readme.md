@@ -13,3 +13,5 @@
     }
 
 otherwise it requires a "page" param in the url, which is not included in the api requests.
+
+![Preview](https://github.com/BenJ1337/redaxo-addon-edit-modules/blob/master/gui-preview.PNG)
