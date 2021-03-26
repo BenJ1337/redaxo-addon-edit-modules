@@ -1,5 +1,15 @@
-# Dieses Addon bietet eine alternative Oberfläche um Module zu bearbeiten
+# This addon provides an alternative gui for editing modules
 
-## Wichtig:
+# In the current Redaxo Version, it requires a change in the core system:
 
-## Dies ist aktuell nur ein Prototyp und sollte nicht in produktiven Systemen eingesetzt werden!
+    \redaxo\src\core\backend.php
+
+
+"rex_api_function::handleCall();" musst be moved to line 206 inside the if-statement
+
+    if (rex::getUser()) {
+    rex_be_controller::appendPackagePages();
+        rex_api_function::handleCall();
+    }
+
+otherwise it requires a "page" param in the url, which is not included in the api requests.

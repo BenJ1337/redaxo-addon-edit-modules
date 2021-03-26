@@ -19,9 +19,8 @@
     .c-module {
         border: 1px solid rgba(0, 0, 0, 0.4);
         padding: 15px 5px;
-        margin-top: 5px;
         background: rgba(0, 0, 0, 0.7);
-        border-radius: 10px;
+        border-radius: 0 0 10px 10px;
     }
 
     .c-module label {
@@ -89,5 +88,15 @@
     .add-btn:hover {
         background-color: #000;
         color: #fff;
+    }
+
+    .module-toggle {
+        width: 100%;
+        padding: 10px 0 10px 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #eee;
+        border: 1px solid #666;
+        text-align: left;
+        margin-top: 3px;
     }
 </style>

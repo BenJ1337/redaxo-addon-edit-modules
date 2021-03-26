@@ -1,6 +1,11 @@
 export const ModulesPanel = {
-    template: `
+    template: `<div>
+                    <button class="module-toggle" data-toggle="collapse" v-bind:data-target="'#content'+index">{{  '#' +this.module.id + ' - ' + this.module.name }}</button>
+                    <div v-bind:id="'content'+index" class="collapse">
                         <div class="container-fluid c-module">
+                            <div v-if="this.stored && !changed" class="alert alert-success">
+                                <strong>Success!</strong> Module successfully stored.
+                            </div>
                             <div class="row">
                                 <div class="col-6 col-sm-6 col-md-6 col-lg-6">
                                     <div class="form-group">
@@ -55,7 +60,9 @@ export const ModulesPanel = {
                                     <button v-if="!this.module.neuanlage" class="delete-btn" v-on:click="resetModule">reset</button>
                                 </div>
                             </div>
-                    </div>`,
+                    </div>
+                </div>
+            </div>`,
     props: {
         module: {},
         index: 0
@@ -63,6 +70,7 @@ export const ModulesPanel = {
     data: function () {
         return {
             changed: false,
+            stored: false,
             backupModule: {}
         }
     },
@@ -86,11 +94,20 @@ export const ModulesPanel = {
             }
         },
         storeModule: function () {
-            this.$store.dispatch('storeModule', this.module);
+            this.$store.dispatch('storeModule', this.module)
+                .then(() => {
+                    Object.assign(this.backupModule, this.module);
+                    this.changed = false;
+                    this.stored = true;
+                });
         },
         resetModule: function () {
-            if (confirm("Do you really want to undo your lokal changes for this module?")) {
-                this.$store.dispatch('resetModule', this.module);
+            if (confirm("Do you really want to undo your local changes for this module?")) {
+                this.$store.dispatch('resetModule', this.module)
+                    .then(() => {
+                        Object.assign(this.backupModule, this.module);
+                        this.changed = false;
+                    });
             }
         }
     }

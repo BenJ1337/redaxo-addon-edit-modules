@@ -37,7 +37,7 @@ export function createStore() {
                 moduleN.updatedate = new Date();
                 if (moduleN.neuanlage) {
                     console.log('store new module in database with id: ' + moduleN.id);
-                    axios.put('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', JSON.stringify(moduleN))
+                    return axios.put('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', JSON.stringify(moduleN))
                         .then(resp => {
                             if (resp.status == 200) {
                                 return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + resp.data.lastId);
@@ -47,7 +47,7 @@ export function createStore() {
                         .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
                 } else {
                     console.log('update module in database with id: ' + moduleN.id);
-                    axios.post('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', 'module=' + JSON.stringify(moduleN))
+                    return axios.post('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', 'module=' + JSON.stringify(moduleN))
                         .then(resp => {
                             if (resp.status == 200) {
                                 return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id);
@@ -67,13 +67,16 @@ export function createStore() {
             },
             resetModule(store, moduleN) {
                 console.log('load current version of module from database for id: ' + moduleN.id);
-                axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id)
+                return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id)
                     .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
             }
         },
         getters: {
             getModules: state => {
                 return state.modules;
+            },
+            getModule: state => (id) => {
+                return state.modules[id];
             }
         }
     });
