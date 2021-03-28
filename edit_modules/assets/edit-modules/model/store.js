@@ -20,7 +20,7 @@ export function createStore() {
         actions: {
             fetchModules(store) {
                 console.log('load module from database');
-                return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules')
+                return axios.get('/redaxo/index.php?rex-api-call=modules&page=edit_modules')
                     .then(resp => {
                         if (resp.data.length > 0) {
                             resp.data.forEach(moduleJSON => {
@@ -31,44 +31,49 @@ export function createStore() {
                         } else {
                             console.log("no modules in database.");
                         }
-                    });
+                    })
+                    .catch(error => console.log(error));
             },
             storeModule(store, moduleN) {
                 moduleN.updatedate = new Date();
                 if (moduleN.neuanlage) {
                     console.log('store new module in database with id: ' + moduleN.id);
-                    return axios.put('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', JSON.stringify(moduleN))
+                    return axios.put('/redaxo/index.php?rex-api-call=modules', JSON.stringify(moduleN))
                         .then(resp => {
                             if (resp.status == 200) {
-                                return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + resp.data.lastId);
+                                return axios.get('/redaxo/index.php?rex-api-call=modules&page=edit_modules&mid=' + resp.data.lastId);
                             }
                             throw new Error("storing failed");
                         })
-                        .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
+                        .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); })
+                        .catch(error => console.log(error));
                 } else {
                     console.log('update module in database with id: ' + moduleN.id);
-                    return axios.post('http://htdocs3.local/redaxo/index.php?rex-api-call=modules', 'module=' + JSON.stringify(moduleN))
+                    return axios.post('/redaxo/index.php?rex-api-call=modules&page=edit_modules', 'module=' + JSON.stringify(moduleN))
                         .then(resp => {
                             if (resp.status == 200) {
-                                return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id);
+                                return axios.get('/redaxo/index.php?rex-api-call=modules&page=edit_modules&mid=' + moduleN.id);
                             }
                             throw new Error("storing failed");
                         })
-                        .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
+                        .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); })
+                        .catch(error => console.log(error));
                 }
             },
             deleteModule(store, module) {
                 console.log('delete module in databse with id: ' + module.id);
                 if (!module.neuanlage) {
-                    axios.delete('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + module.id)
-                        .then(resp => console.log(resp.data));
+                    axios.delete('/redaxo/index.php?rex-api-call=modules&page=edit_modules&mid=' + module.id)
+                        .then(resp => console.log(resp.data))
+                        .catch(error => console.log(error));
                 }
                 store.commit('deleteModule', module);
             },
             resetModule(store, moduleN) {
                 console.log('load current version of module from database for id: ' + moduleN.id);
-                return axios.get('http://htdocs3.local/redaxo/index.php?rex-api-call=modules&mid=' + moduleN.id)
-                    .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); });
+                return axios.get('/redaxo/index.php?rex-api-call=modules&page=edit_modules&mid=' + moduleN.id)
+                    .then(resp => { store.commit('deleteModule', moduleN); store.commit('addModule', parseModuleJSON(resp.data[0])); })
+                    .catch(error => console.log(error));
             }
         },
         getters: {
