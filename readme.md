@@ -1,11 +1,11 @@
 # This addon provides an alternative gui for editing modules
 
-# In the current Redaxo Version, it requires a change in the core system:
+# In the current Redaxo Version (Mar 26, 2021), it requires a change in the core system:
 
     \redaxo\src\core\backend.php
 
 
-"rex_api_function::handleCall();" musst be moved to line 206 inside the if-statement
+"rex_api_function::handleCall();" has to be moved to line 206 inside the if statement
 
     if (rex::getUser()) {
     rex_be_controller::appendPackagePages();
